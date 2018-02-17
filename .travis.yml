@@ -5,3 +5,7 @@ script:
   - dotnet restore
   - dotnet build ./hspc_api
   - dotnet test ./Tests
+branches:
+  only:
+    - master
+    - develop
