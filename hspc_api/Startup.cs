@@ -78,17 +78,22 @@ namespace hspc_api
                 app.UseDeveloperExceptionPage();
             }
 
+            using (var serviceScope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope())
+            {
+                var context = serviceScope.ServiceProvider.GetRequiredService<UserDbContext>();
+                context.Database.Migrate();
+                context.Database.EnsureCreated();
+            }
+
+
             app.UseForwardedHeaders(new ForwardedHeadersOptions
             {
                 ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
             });
 
+
             app.UseAuthentication();
             app.UseMvc();
-
-
-
-
 
         }
     }
