@@ -6,6 +6,8 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using hspc_api.Filters;
+using hspc_api.Models;
 using JWT;
 using JWT.Algorithms;
 using JWT.Serializers;
@@ -20,13 +22,13 @@ namespace hspc_api.Controllers
 {
 
     [Route("[controller]/[action]")]
-    public class AccountController : Controller
+    public class AuthController : Controller
     {
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly UserManager<IdentityUser> _userManager;
         private readonly IConfiguration _configuration;
 
-        public AccountController(
+        public AuthController(
             UserManager<IdentityUser> userManager,
             SignInManager<IdentityUser> signInManager,
             IConfiguration configuration
@@ -38,37 +40,54 @@ namespace hspc_api.Controllers
         }
 
         [HttpPost]
-        public async Task<object> Login([FromBody] LoginDto model)
+        [ValidateModel]
+        public async Task<object> login([FromBody] LoginDto model)
         {
+            try {
+                
+                var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, false, false);
 
-            var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, false, false);
+                if (result.Succeeded)
+                {
+                    var appUser = _userManager.Users.SingleOrDefault(r => r.Email == model.Email);
 
-            if (result.Succeeded)
-            {
-                var appUser = _userManager.Users.SingleOrDefault(r => r.Email == model.Email);
-                return await GenerateJwtToken(model.Email, appUser);
+                    return Ok(await GenerateJwtToken(model.Email, appUser));
+                }
+                return Unauthorized();
+
+            } catch (Exception e) {
+                
+                return BadRequest(e);
             }
-
-            throw new ApplicationException("INVALID_LOGIN_ATTEMPT");
         }
 
         [HttpPost]
-        public async Task<object> Register([FromBody] RegisterDto model)
+        [ValidateModel]
+        public async Task<object> register([FromBody] RegisterDto model)
         {
-            var user = new IdentityUser
-            {
-                UserName = model.Email,
-                Email = model.Email
-            };
-            var result = await _userManager.CreateAsync(user, model.Password);
+            try {
 
-            if (result.Succeeded)
-            {
-                await _signInManager.SignInAsync(user, false);
-                return await GenerateJwtToken(model.Email, user);
+                var user = new IdentityUser
+                {
+                    UserName = model.Email,
+                    Email = model.Email
+                };
+                var result = await _userManager.CreateAsync(user, model.Password);
+
+                if (result.Succeeded)
+                {
+                    await _signInManager.SignInAsync(user, false);
+                    var token = await GenerateJwtToken(model.Email, user);
+                    return Ok(new { token });
+
+                }
+
+                return StatusCode(409);
+
+            } catch (Exception e) {
+                
+                return BadRequest(e);
             }
-
-            throw new ApplicationException("UNKNOWN_ERROR");
         }
 
 
@@ -83,9 +102,9 @@ namespace hspc_api.Controllers
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtKey"]));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-            var expires = DateTime.Now.AddDays(Convert.ToDouble(_configuration["JwtExpireDays"]));
+            var expires = DateTime.Now.AddMinutes(Convert.ToDouble(_configuration["JwtExpireTime"]));
 
-            var token = new JwtSecurityToken(
+            var jwt = new JwtSecurityToken(
                 _configuration["JwtIssuer"],
                 _configuration["JwtIssuer"],
                 claims,
@@ -93,27 +112,9 @@ namespace hspc_api.Controllers
                 signingCredentials: creds
             );
 
-            return new JwtSecurityTokenHandler().WriteToken(token);
+            var token = await Task.Run(() => new JwtSecurityTokenHandler().WriteToken(jwt));
+            return new { token, expires };
         }
 
-        public class LoginDto
-        {
-            [Required]
-            public string Email { get; set; }
-
-            [Required]
-            public string Password { get; set; }
-
-        }
-
-        public class RegisterDto
-        {
-            [Required]
-            public string Email { get; set; }
-
-            [Required]
-            [StringLength(100, ErrorMessage = "PASSWORD_MIN_LENGTH", MinimumLength = 6)]
-            public string Password { get; set; }
-        }
     }
 }
