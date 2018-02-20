@@ -11,24 +11,34 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace hspc_api.Controllers
 {
-    [Route("api/[controller]")]
-    public class ValuesController : Controller
+    [Route("[controller]")]
+    public class TokenController : Controller
     {
         IArticleService articleService;
         private readonly UserManager<IdentityUser> _userManager;
 
 
-        public ValuesController(IArticleService articleService, UserManager<IdentityUser> userManager) {
+        public TokenController(IArticleService articleService, UserManager<IdentityUser> userManager) {
             this.articleService = articleService;
             _userManager = userManager;
         }
 
         [Authorize]
         [HttpGet]
-        public async Task<object> Protected()
+
+        public async Task<object> Test()
         {
             var user = await _userManager.GetUserAsync(HttpContext.User);
-            return new JsonResult(user);
+            if(user != null) {
+                return Ok();
+            }
+            return Unauthorized();
         }
+
+
+        /*[HttpGet]
+        public async Task<object> Token() {
+            throw new NotImplementedException();
+        }*/
     }
 }
