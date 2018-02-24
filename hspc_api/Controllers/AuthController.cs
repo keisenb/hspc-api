@@ -21,7 +21,6 @@ using Microsoft.IdentityModel.Tokens;
 namespace hspc_api.Controllers
 {
 
-    [Route("[controller]/[action]")]
     public class AuthController : Controller
     {
         private readonly SignInManager<ApplicationUser> _signInManager;
@@ -41,6 +40,7 @@ namespace hspc_api.Controllers
 
         [HttpPost]
         [ValidateModel]
+        [Route("auth/login")]
         public async Task<object> login([FromBody] LoginDto model)
         {
             try {
@@ -63,6 +63,7 @@ namespace hspc_api.Controllers
 
         [HttpPost]
         [ValidateModel]
+        [Route("auth/register")]
         public async Task<object> register([FromBody] RegisterDto model)
         {
             try {
