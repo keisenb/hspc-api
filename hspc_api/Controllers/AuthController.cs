@@ -24,13 +24,13 @@ namespace hspc_api.Controllers
     [Route("[controller]/[action]")]
     public class AuthController : Controller
     {
-        private readonly SignInManager<IdentityUser> _signInManager;
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly UserManager<ApplicationUser> _userManager;
         private readonly IConfiguration _configuration;
 
         public AuthController(
-            UserManager<IdentityUser> userManager,
-            SignInManager<IdentityUser> signInManager,
+            UserManager<ApplicationUser> userManager,
+            SignInManager<ApplicationUser> signInManager,
             IConfiguration configuration
             )
         {
@@ -67,7 +67,7 @@ namespace hspc_api.Controllers
         {
             try {
 
-                var user = new IdentityUser
+                var user = new ApplicationUser
                 {
                     UserName = model.Email,
                     Email = model.Email
@@ -102,7 +102,7 @@ namespace hspc_api.Controllers
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtKey"]));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-            var expires = DateTime.Now.AddMinutes(Convert.ToDouble(_configuration["JwtExpireTime"]));
+            var expires = DateTime.Now.AddMinutes(10).ToUniversalTime();
 
             var jwt = new JwtSecurityToken(
                 _configuration["JwtIssuer"],

@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using hspc_api.Contracts;
 using hspc_api.Data;
+using hspc_api.Models;
 using hspc_api.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -33,18 +34,20 @@ namespace hspc_api
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddCors();
-
             services.AddMvc();
-
-            services.AddDbContext<UserDbContext>(x => x.UseMySql(Configuration.GetConnectionString("MySQLConnection")));
 
             //Dependency Injection
             services.AddTransient<IArticleService, ArticleService>();
+            services.AddTransient<IRoleService, RoleService>();
+
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
 
-            services.AddIdentity<IdentityUser, IdentityRole>()
+
+            services.AddDbContext<UserDbContext>(x => x.UseMySql(Configuration.GetConnectionString("MySQLConnection")));
+            services.AddIdentity<ApplicationUser, ApplicationRole>()
                     .AddEntityFrameworkStores<UserDbContext>();
+
 
             // ===== Add Jwt Authentication ========
             JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear(); // => remove default claims
@@ -86,7 +89,10 @@ namespace hspc_api
                 var context = serviceScope.ServiceProvider.GetRequiredService<UserDbContext>();
                 context.Database.Migrate();
                 context.Database.EnsureCreated();
+
             }
+
+
 
 
             app.UseForwardedHeaders(new ForwardedHeadersOptions
