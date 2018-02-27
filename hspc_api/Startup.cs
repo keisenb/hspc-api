@@ -106,7 +106,7 @@ namespace hspc_api
 
 
             app.UseCors(builder =>
-                builder.WithOrigins("http://localhost:4200", "https://hspc-api.azurewebsites.net")
+                builder.WithOrigins("http://localhost:4200", "https://judge.keisenb.io")
                 .AllowAnyHeader()
                 .AllowAnyMethod());
 
