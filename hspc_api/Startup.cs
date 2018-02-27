@@ -10,6 +10,7 @@ using hspc_api.Models;
 using hspc_api.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -47,6 +48,9 @@ namespace hspc_api
             services.AddDbContext<UserDbContext>(x => x.UseMySql(Configuration.GetConnectionString("MySQLConnection")));
             services.AddIdentity<ApplicationUser, ApplicationRole>()
                     .AddEntityFrameworkStores<UserDbContext>();
+
+
+
 
 
             // ===== Add Jwt Authentication ========
@@ -100,8 +104,12 @@ namespace hspc_api
                 ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
             });
 
-            app.UseCors(
-                options => options.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+
+            app.UseCors(builder =>
+                builder.WithOrigins("http://localhost:4200", "https://hspc-api.azurewebsites.net")
+                .AllowAnyHeader()
+                .AllowAnyMethod());
+
 
 
             app.UseAuthentication();
