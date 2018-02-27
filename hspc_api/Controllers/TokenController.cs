@@ -4,7 +4,9 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using hspc_api.Contracts;
+using hspc_api.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -15,17 +17,16 @@ namespace hspc_api.Controllers
     public class TokenController : Controller
     {
         IArticleService articleService;
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly UserManager<ApplicationUser> _userManager;
 
 
-        public TokenController(IArticleService articleService, UserManager<IdentityUser> userManager) {
+        public TokenController(IArticleService articleService, UserManager<ApplicationUser> userManager) {
             this.articleService = articleService;
             _userManager = userManager;
         }
 
         [Authorize]
         [HttpGet]
-
         public async Task<object> Test()
         {
             var user = await _userManager.GetUserAsync(HttpContext.User);

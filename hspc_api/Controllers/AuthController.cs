@@ -67,23 +67,23 @@ namespace hspc_api.Controllers
         public async Task<object> register([FromBody] RegisterDto model)
         {
             try {
-
+                if(!ModelState.IsValid) {
+                    return BadRequest(ModelState);
+                }
                 var user = new ApplicationUser
                 {
                     UserName = model.Email,
                     Email = model.Email
                 };
                 var result = await _userManager.CreateAsync(user, model.Password);
-
                 if (result.Succeeded)
                 {
                     await _signInManager.SignInAsync(user, false);
                     var token = await GenerateJwtToken(model.Email, user);
-                    return Ok(new { token });
-
+                    return Ok(token);
                 }
+                return BadRequest(new { errors = result.Errors });
 
-                return StatusCode(409);
 
             } catch (Exception e) {
                 
