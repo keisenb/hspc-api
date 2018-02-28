@@ -13,8 +13,7 @@ namespace hspc_api.Models
         public string Email { get; set; }
 
         [Required]
-        [RegularExpression("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[$@$!%*?&])[A-Za-z\\d$@$!%*?&]{6,}", 
-                           ErrorMessage = "Password requires upper case, lower case, number, special character, and a mininmum length of 6.")]
+        [RegularExpression(@"^(?=.*[a-z|A-Z])(?=.*[A-Z])(?=.*\d)(?=.*(_|[^\w])).{6,100}", ErrorMessage = "Password requires upper case, lower case, number, special character, and a mininmum length of 6.")]
         public string Password { get; set; }
 
     }
