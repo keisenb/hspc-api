@@ -11,9 +11,10 @@ using System;
 namespace hspc_api.Migrations
 {
     [DbContext(typeof(UserDbContext))]
-    partial class UserDbContextModelSnapshot : ModelSnapshot
+    [Migration("20180324211656_teams_migration")]
+    partial class teams_migration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -99,20 +100,6 @@ namespace hspc_api.Migrations
                         .HasName("UserNameIndex");
 
                     b.ToTable("AspNetUsers");
-                });
-
-            modelBuilder.Entity("hspc_api.Models.Problem", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<string>("Name");
-
-                    b.Property<int>("Number");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Problems");
                 });
 
             modelBuilder.Entity("hspc_api.Models.Team", b =>

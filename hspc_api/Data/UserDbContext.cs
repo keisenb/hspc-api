@@ -12,5 +12,10 @@ namespace hspc_api.Data
                 : base(options)
         {
         }
+
+        public DbSet<Team> Teams { get; set; }
+
+        public DbSet<Problem> Problems { get; set; }
+
     }
 }
