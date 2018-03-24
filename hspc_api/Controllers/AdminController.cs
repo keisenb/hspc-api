@@ -105,12 +105,14 @@ namespace hspc_api.Controllers
             {
                 if (!ModelState.IsValid)
                 {
-                    return BadRequest(ModelState);
+                    return BadRequest(ModelState); //todo: validate that advanced and beginner are opposite
                 }
                 var problem = new Problem()
                 {
                     Name = model.Name,
-                    Number = model.Number
+                    Number = model.Number,
+                    Advanced = model.Advanced,
+                    Beginner = model.Beginner
                 };
                 var dbProblem = await _dbContext.Problems.AddAsync(problem);
                 var result = await _dbContext.SaveChangesAsync();
@@ -170,7 +172,9 @@ namespace hspc_api.Controllers
                 var team = new Team()
                 {
                     Name = model.Name,
-                    Score = 0
+                    Score = 0,
+                    Advanced = model.Advanced,
+                    Beginner = model.Beginner
                 };
                 var dbTeam = await _dbContext.Teams.AddAsync(team);
                 var result = await _dbContext.SaveChangesAsync();

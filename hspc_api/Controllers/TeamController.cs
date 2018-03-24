@@ -38,6 +38,42 @@ namespace hspc_api.Controllers
         }
 
         [HttpGet]
+        [Route("/teams/beginner")]
+        public object GetBeginnerTeams()
+        {
+            try
+            {
+
+                var dbTeam = _dbContext.Teams; //todo select only Beginner Teams
+                return Ok(dbTeam);
+
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+
+        }
+
+        [HttpGet]
+        [Route("/teams/advanced")]
+        public object GetAdvancedTeams()
+        {
+            try
+            {
+
+                var dbTeam = _dbContext.Teams; //todo select only Advanced Teams
+                return Ok(dbTeam);
+
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+
+        }
+
+        [HttpGet]
         [Route("/teams/{id}")]
         public async Task<object> GetTeam([FromRoute] int id)
         {

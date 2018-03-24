@@ -16,5 +16,9 @@ namespace hspc_api.Models
 
         [Required]
         public int Number { get; set; }
+        [Required]
+        public bool Beginner { get; set; }
+        [Required]
+        public bool Advanced { get; set; }
     }
 }

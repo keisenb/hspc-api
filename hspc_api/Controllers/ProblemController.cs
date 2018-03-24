@@ -38,6 +38,40 @@ namespace hspc_api.Controllers
         }
 
         [HttpGet]
+        [Route("/problems/beginner")]
+        public object GetBeginnerProblems()
+        {
+            try
+            {
+                var result = _dbContext.Problems; //todo: select only beginner problems
+                return Ok(result);
+
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+
+        }
+
+        [HttpGet]
+        [Route("/problems/advanced")]
+        public object GetAdvancedProblems() 
+        {
+            try
+            {
+                var result = _dbContext.Problems; //todo: select only advanced problems
+                return Ok(result);
+
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+
+        }
+
+        [HttpGet]
         [Route("/problems/{id}")]
         public async Task<object> GetProblem([FromRoute] int id)
         {
