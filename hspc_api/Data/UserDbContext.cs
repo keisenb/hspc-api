@@ -17,5 +17,6 @@ namespace hspc_api.Data
 
         public DbSet<Problem> Problems { get; set; }
 
+        public DbSet<TeamProblems> TeamProblems { get; set; }
     }
 }

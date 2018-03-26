@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using hspc_api.Data;
 using hspc_api.Models;
@@ -26,7 +27,7 @@ namespace hspc_api.Controllers
             try
             {
                
-                var dbTeam = _dbContext.Teams;
+                var dbTeam = _dbContext.Teams.ToList();
                 return Ok(dbTeam);
 
             }
@@ -38,13 +39,14 @@ namespace hspc_api.Controllers
         }
 
         [HttpGet]
-        [Route("/teams/beginner")]
-        public object GetBeginnerTeams()
+        [Route("/teams/{problemId}/beginner")]
+        public object GetBeginnerTeams([FromRoute] int problemId)
         {
             try
             {
 
-                var dbTeam = _dbContext.Teams; //todo select only Beginner Teams
+                var dbTeam = _dbContext.Teams.Where(x => x.Beginner == true).ToList(); //todo join TeamProblems and add problem id to query
+
                 return Ok(dbTeam);
 
             }
@@ -62,7 +64,7 @@ namespace hspc_api.Controllers
             try
             {
 
-                var dbTeam = _dbContext.Teams; //todo select only Advanced Teams
+                var dbTeam = _dbContext.Teams.Where(x => x.Advanced == true).ToList(); //todo same as beginner
                 return Ok(dbTeam);
 
             }
@@ -75,12 +77,12 @@ namespace hspc_api.Controllers
 
         [HttpGet]
         [Route("/teams/{id}")]
-        public async Task<object> GetTeam([FromRoute] int id)
+        public object GetTeam([FromRoute] int id)
         {
             try
             {
 
-                var dbTeam = await _dbContext.Teams.FindAsync(id);
+                var dbTeam = _dbContext.Teams.Where(x=> x.Id == id).FirstOrDefault();
                 return Ok(dbTeam);
 
             }

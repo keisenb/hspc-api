@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using hspc_api.Data;
 using hspc_api.Models;
@@ -26,7 +27,7 @@ namespace hspc_api.Controllers
         {
             try
             {
-                var result = _dbContext.Problems;
+                var result = _dbContext.Problems.ToList();
                 return Ok(result);
 
             }
@@ -43,7 +44,7 @@ namespace hspc_api.Controllers
         {
             try
             {
-                var result = _dbContext.Problems; //todo: select only beginner problems
+                var result = _dbContext.Problems.Where(x=> x.Beginner == true).ToList(); //todo: not returning only beginner teams
                 return Ok(result);
 
             }
@@ -60,7 +61,7 @@ namespace hspc_api.Controllers
         {
             try
             {
-                var result = _dbContext.Problems; //todo: select only advanced problems
+                var result = _dbContext.Problems.Where(x => x.Advanced == true).ToList(); //todo: select only advanced problems
                 return Ok(result);
 
             }
@@ -73,12 +74,14 @@ namespace hspc_api.Controllers
 
         [HttpGet]
         [Route("/problems/{id}")]
-        public async Task<object> GetProblem([FromRoute] int id)
+        public object GetProblem([FromRoute] int id)
         {
             try
             {
-
-                var result = await _dbContext.Problems.FindAsync(id);
+                var result = _dbContext.Problems.Where(x => x.Id == id).FirstOrDefault();
+                if(result == null) {
+                    return NotFound();
+                }
                 return Ok(result);
 
             }

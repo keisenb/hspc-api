@@ -11,9 +11,10 @@ using System;
 namespace hspc_api.Migrations
 {
     [DbContext(typeof(UserDbContext))]
-    partial class UserDbContextModelSnapshot : ModelSnapshot
+    [Migration("20180326132338_teamQuestions")]
+    partial class teamQuestions
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -143,6 +144,8 @@ namespace hspc_api.Migrations
                         .ValueGeneratedOnAdd();
 
                     b.Property<bool?>("Correct");
+
+                    b.Property<bool?>("Incorrect");
 
                     b.Property<bool?>("MarkedForJudging");
 
