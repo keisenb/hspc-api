@@ -147,14 +147,13 @@ namespace hspc_api.Controllers
                 {
                     return NotFound(new { errors = "Could not find problem object with specified id: " + id });
                 }
+                var teamProblems = _dbContext.TeamProblems.Where(x => x.Problem.Id == id).ToList();
+
+                teamProblems.ForEach(x => _dbContext.Remove<TeamProblems>(x));
+
                 var deleted = _dbContext.Remove<Problem>(problem);
                 var result = await _dbContext.SaveChangesAsync();
-
-                if (result == 1)
-                {
-                    return Ok(deleted.Entity);
-                }
-                return BadRequest();
+                return Ok(deleted.Entity);
             }
             catch (Exception e)
             {
@@ -216,13 +215,15 @@ namespace hspc_api.Controllers
                 {
                     return NotFound(new { errors = "Could not find team object with specified id: " + id });
                 }
+
+                var teamProblems = _dbContext.TeamProblems.Where(x => x.Team.Id == id).ToList();
+                teamProblems.ForEach(x => _dbContext.Remove<TeamProblems>(x));
+
                 var deleted = _dbContext.Remove<Team>(team);
                 var result = await _dbContext.SaveChangesAsync();
 
-                if(result == 1) {
-                    return Ok(deleted.Entity);
-                }
-                return BadRequest();
+                return Ok(deleted.Entity);
+
             }
             catch (Exception e)
             {
