@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using hspc_api.Data;
 using hspc_api.Filters;
@@ -115,12 +116,15 @@ namespace hspc_api.Controllers
                     Beginner = model.Beginner
                 };
                 var dbProblem = await _dbContext.Problems.AddAsync(problem);
-                var result = await _dbContext.SaveChangesAsync();
-                if (result == 1)
-                {
-                    return Ok(dbProblem.Entity);
-                }
-                return BadRequest(result);
+
+                _dbContext.Teams
+                         .Where(x => x.Beginner == model.Beginner)
+                         .Where(x => x.Advanced == model.Advanced)
+                         .ToList()
+                         .ForEach(x => _dbContext.TeamProblems.Add(new TeamProblems() { Problem = dbProblem.Entity, Team = x, MarkedForJudging = false }));
+
+                await _dbContext.SaveChangesAsync();
+                return Ok(dbProblem.Entity);
             }
             catch (Exception e)
             {
@@ -169,6 +173,9 @@ namespace hspc_api.Controllers
                 {
                     return BadRequest(ModelState);
                 }
+                if(model.Advanced == model.Beginner) {
+                    return BadRequest(new { message = "Advanced and Beginner must not be the same" });
+                }
                 var team = new Team()
                 {
                     Name = model.Name,
@@ -177,11 +184,16 @@ namespace hspc_api.Controllers
                     Beginner = model.Beginner
                 };
                 var dbTeam = await _dbContext.Teams.AddAsync(team);
-                var result = await _dbContext.SaveChangesAsync();
-                if(result == 1) {
-                    return Ok(dbTeam.Entity);
-                }
-                return BadRequest(result);
+
+                _dbContext.Problems
+                          .Where(x => x.Beginner == model.Beginner)
+                          .Where(x => x.Advanced == model.Advanced)
+                          .ToList()
+                          .ForEach(x => _dbContext.TeamProblems.Add(new TeamProblems() { Team = dbTeam.Entity, Problem = x, MarkedForJudging = false } ));
+
+                await _dbContext.SaveChangesAsync();
+                return Ok(dbTeam.Entity);
+
             }
             catch (Exception e)
             {
