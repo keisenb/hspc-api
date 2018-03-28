@@ -11,9 +11,10 @@ using System;
 namespace hspc_api.Migrations
 {
     [DbContext(typeof(UserDbContext))]
-    partial class UserDbContextModelSnapshot : ModelSnapshot
+    [Migration("20180324230734_update_problems")]
+    partial class update_problems
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -137,28 +138,6 @@ namespace hspc_api.Migrations
                     b.ToTable("Teams");
                 });
 
-            modelBuilder.Entity("hspc_api.Models.TeamProblems", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<bool?>("Correct");
-
-                    b.Property<bool?>("MarkedForJudging");
-
-                    b.Property<int?>("ProblemId");
-
-                    b.Property<int?>("TeamId");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProblemId");
-
-                    b.HasIndex("TeamId");
-
-                    b.ToTable("TeamProblems");
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.Property<int>("Id")
@@ -241,17 +220,6 @@ namespace hspc_api.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens");
-                });
-
-            modelBuilder.Entity("hspc_api.Models.TeamProblems", b =>
-                {
-                    b.HasOne("hspc_api.Models.Problem", "Problem")
-                        .WithMany("TeamProblems")
-                        .HasForeignKey("ProblemId");
-
-                    b.HasOne("hspc_api.Models.Team", "Team")
-                        .WithMany("TeamProblems")
-                        .HasForeignKey("TeamId");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

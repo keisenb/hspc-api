@@ -25,17 +25,20 @@ namespace hspc_api.Controllers
     {
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly RoleManager<ApplicationRole> _roleManager;
         private readonly IConfiguration _configuration;
 
         public AuthController(
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
-            IConfiguration configuration
+            IConfiguration configuration,
+            RoleManager<ApplicationRole> roleManager
             )
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _configuration = configuration;
+            _roleManager = roleManager;
         }
 
         [HttpPost]
@@ -57,7 +60,7 @@ namespace hspc_api.Controllers
 
             } catch (Exception e) {
                 
-                return BadRequest(e);
+                return BadRequest(e.Message);
             }
         }
 
@@ -80,26 +83,32 @@ namespace hspc_api.Controllers
                 {
                     await _signInManager.SignInAsync(user, false);
                     var token = await GenerateJwtToken(model.Email, user);
-                    return Ok(token);
+                    return Ok(token );
                 }
                 return BadRequest(new { errors = result.Errors });
 
 
             } catch (Exception e) {
                 
-                return BadRequest(e);
+                return BadRequest(e.Message);
             }
         }
 
 
-        private async Task<object> GenerateJwtToken(string email, IdentityUser user)
+        private async Task<object> GenerateJwtToken(string email, ApplicationUser user)
         {
+            var roles = await _userManager.GetRolesAsync(user);
+
             var claims = new List<Claim>
             {
                 new Claim(JwtRegisteredClaimNames.Sub, email),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 new Claim(ClaimTypes.NameIdentifier, user.Id)
             };
+
+            foreach(var role in roles) {
+                claims.Add(new Claim(ClaimTypes.Role, role));
+            }
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtKey"]));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);

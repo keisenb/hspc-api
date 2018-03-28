@@ -44,7 +44,6 @@ namespace hspc_api
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
 
-
             services.AddDbContext<UserDbContext>(x => x.UseMySql(Configuration.GetConnectionString("MySQLConnection")));
             services.AddIdentity<ApplicationUser, ApplicationRole>()
                     .AddEntityFrameworkStores<UserDbContext>();
@@ -76,7 +75,6 @@ namespace hspc_api
                     };
                 });
 
-
            
         }
 
@@ -90,9 +88,9 @@ namespace hspc_api
 
             using (var serviceScope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope())
             {
-                var context = serviceScope.ServiceProvider.GetRequiredService<UserDbContext>();
-                context.Database.Migrate();
-                context.Database.EnsureCreated();
+                var dbContext = serviceScope.ServiceProvider.GetRequiredService<UserDbContext>();
+                dbContext.Database.Migrate();
+                dbContext.Database.EnsureCreated();
 
             }
 
