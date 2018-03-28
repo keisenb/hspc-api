@@ -5,6 +5,7 @@ using hspc_api.Data;
 using hspc_api.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace hspc_api.Controllers
 {
@@ -29,9 +30,15 @@ namespace hspc_api.Controllers
                 {
                     return BadRequest(ModelState);
                 }
-                if(_dbContext.TeamProblems.Where(x => x.Problem.Id == model.ProblemId && x.Team.Id == model.TeamId).FirstOrDefault() != null) 
+                var teamProblem = _dbContext.TeamProblems.Where(x => x.Problem.Id == model.ProblemId && x.Team.Id == model.TeamId).FirstOrDefault();
+                if(teamProblem != null) 
                 {
-                    return BadRequest(new { message = "Team already marked" });
+                    teamProblem.MarkedForJudging = true;
+                    var updateResult = await _dbContext.SaveChangesAsync();
+                    if(updateResult == 1) {
+                        return Ok(teamProblem);
+                    }
+                    return BadRequest(updateResult);
                 }
 
                 var team = _dbContext.Teams.Where(x => x.Id == model.TeamId).FirstOrDefault();
@@ -44,19 +51,52 @@ namespace hspc_api.Controllers
                 {
                     return BadRequest(new { message = "Invalid problem id" });
                 }
-                var teamProblem = new TeamProblems
+                var newTp = new TeamProblems
                 {
                     Team = team,
                     Problem = problem,
                     MarkedForJudging = true
 
                 };
-                var entity = await _dbContext.TeamProblems.AddAsync(teamProblem);
+                var entity = await _dbContext.TeamProblems.AddAsync(newTp);
                 var result = await _dbContext.SaveChangesAsync();
                 if(result == 1) {
                     return Ok(entity.Entity);
                 }
                 return BadRequest(result);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
+
+        [HttpPost]
+        [Route("/judge/answer")]
+        public async Task<object> MarkTeamForAnswerAsync([FromBody] MarkTeamForAnswerDto model)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+                var teamProblem = _dbContext.TeamProblems.Where(x => x.Problem.Id == model.ProblemId && x.Team.Id == model.TeamId).Include(tp => tp.Team).FirstOrDefault();
+                if (teamProblem != null)
+                {
+                    if(teamProblem.Correct == model.Correct) {
+                        return Ok(teamProblem);
+                    }
+                    teamProblem.Correct = model.Correct;
+                    var updateResult = await _dbContext.SaveChangesAsync();
+                    if (updateResult == 1)
+                    {
+                        return Ok(teamProblem);
+                    }
+                    return BadRequest(updateResult);
+                }
+                return BadRequest(new { message = "Unable to find entity with specified Team and Problem Id's"});
             }
             catch (Exception e)
             {

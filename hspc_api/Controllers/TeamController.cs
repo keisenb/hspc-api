@@ -6,10 +6,12 @@ using hspc_api.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 
 namespace hspc_api.Controllers
 {
-    [Authorize(Roles = Roles.ROLE_JUDGE + "," + Roles.ROLE_ADMINISTRATOR )]
+    [Authorize(Roles = Roles.ROLE_JUDGE + "," + Roles.ROLE_ADMINISTRATOR)]
     public class TeamController : Controller
     {
 
@@ -23,10 +25,11 @@ namespace hspc_api.Controllers
 
         [HttpGet]
         [Route("/teams")]
-        public object GetTeams() {
+        public object GetTeams()
+        {
             try
             {
-               
+
                 var dbTeam = _dbContext.Teams.ToList();
                 return Ok(dbTeam);
 
@@ -35,7 +38,7 @@ namespace hspc_api.Controllers
             {
                 return BadRequest(e.Message);
             }
-           
+
         }
 
         [HttpGet]
@@ -44,28 +47,36 @@ namespace hspc_api.Controllers
         {
             try
             {
-
-                var dbTeam = _dbContext.Teams.Where(x => x.Beginner == true).ToList(); //todo join TeamProblems and add problem id to query
-
-                return Ok(dbTeam);
+                var result = _dbContext.TeamProblems
+                                       .Where(x => x.Problem.Id == problemId)
+                                       .Where(x => x.Team.Beginner == true)
+                                       .Include(x => x.Team)
+                                       .Include(x => x.Problem)
+                                       .ToList();
+                return Ok(result);
 
             }
             catch (Exception e)
             {
-                return BadRequest(e.Message);
+                return BadRequest(e);
             }
 
         }
 
         [HttpGet]
-        [Route("/teams/advanced")]
-        public object GetAdvancedTeams()
+        [Route("/teams/{problemId}/advanced")]
+        public object GetAdvancedTeams([FromRoute] int problemId)
         {
             try
             {
 
-                var dbTeam = _dbContext.Teams.Where(x => x.Advanced == true).ToList(); //todo same as beginner
-                return Ok(dbTeam);
+                var result = _dbContext.TeamProblems
+                                       .Where(x => x.Problem.Id == problemId)
+                                       .Where(x => x.Team.Advanced == true)
+                                       .Include(x => x.Team)
+                                       .Include(x => x.Problem)
+                                       .ToList();
+                return Ok(result);
 
             }
             catch (Exception e)
@@ -82,7 +93,7 @@ namespace hspc_api.Controllers
             try
             {
 
-                var dbTeam = _dbContext.Teams.Where(x=> x.Id == id).FirstOrDefault();
+                var dbTeam = _dbContext.Teams.Where(x => x.Id == id).FirstOrDefault();
                 return Ok(dbTeam);
 
             }
