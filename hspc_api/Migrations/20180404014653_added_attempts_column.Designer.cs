@@ -11,9 +11,10 @@ using System;
 namespace hspc_api.Migrations
 {
     [DbContext(typeof(UserDbContext))]
-    partial class UserDbContextModelSnapshot : ModelSnapshot
+    [Migration("20180404014653_added_attempts_column")]
+    partial class added_attempts_column
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -129,6 +130,8 @@ namespace hspc_api.Migrations
                     b.Property<bool>("Beginner");
 
                     b.Property<string>("Name");
+
+                    b.Property<int>("Score");
 
                     b.HasKey("Id");
 

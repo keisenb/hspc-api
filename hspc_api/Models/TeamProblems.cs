@@ -16,5 +16,7 @@ namespace hspc_api.Models
 
         public bool? Correct { get; set; }
 
+        public int Attempts { get; set; }
+
     }
 }

@@ -13,7 +13,6 @@ namespace hspc_api.Models
         [Key]
         public int Id { get; set; }
         public string Name { get; set; }
-        public int Score { get; set; }
         public bool Beginner { get; set; }
         public bool Advanced { get; set; }
     }
