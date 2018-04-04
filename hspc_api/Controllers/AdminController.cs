@@ -178,7 +178,6 @@ namespace hspc_api.Controllers
                 var team = new Team()
                 {
                     Name = model.Name,
-                    Score = 0,
                     Advanced = model.Advanced,
                     Beginner = model.Beginner
                 };
