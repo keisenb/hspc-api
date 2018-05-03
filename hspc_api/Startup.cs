@@ -91,7 +91,6 @@ namespace hspc_api
                 var dbContext = serviceScope.ServiceProvider.GetRequiredService<UserDbContext>();
                 dbContext.Database.Migrate();
                 dbContext.Database.EnsureCreated();
-
             }
 
 
